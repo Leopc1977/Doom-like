@@ -16,7 +16,7 @@ config/icon="res://icon.png"
 
 [autoload]
 
-Network="*res://NetworkEngine/network.gd"
+Network="*res://NetworkEngine/Network.gd"
 Global="*res://NetworkEngine/Global.gd"
 
 [input]

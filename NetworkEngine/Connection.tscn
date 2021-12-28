@@ -1,10 +1,8 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=2 format=2]
 
 [ext_resource path="res://NetworkEngine/NetworkSetup.gd" type="Script" id=1]
-[ext_resource path="res://NetworkEngine/Global.gd" type="Script" id=2]
 
 [node name="World" type="Spatial"]
-script = ExtResource( 2 )
 
 [node name="NetworkSetup" type="Control" parent="."]
 anchor_left = 0.5

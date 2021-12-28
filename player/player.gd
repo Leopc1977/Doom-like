@@ -2,7 +2,9 @@ extends KinematicBody
 
 const MOUSE_SENSITIVITY = .1
 
-onready var camera = $CamRoot/Camera
+export(NodePath) onready var camera = get_node("CamRoot") as Spatial
+export(NodePath) onready var timer_network_update = get_node("TimerNetworkUpdate") as Timer
+export(NodePath) onready var tween_movement = get_node("TweenMovement") as Tween
 
 #Deplacement
 var velocity = Vector3.ZERO
@@ -19,13 +21,16 @@ const JUMP_SPEED = 15
 var jump_cnt = 0
 const AIR_ACCEL = 9.0
 
+#Puppet
+var puppet_position = Vector3()
+var puppet_velocity = Vector3()
+#var puppet_rotation = Vector2() rotation de la tete
+
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
-	
 func _process(delta):
-	if is_network_master():
-		window_activity()
+	window_activity()
 
 func _physics_process(delta):
 	if is_network_master():
@@ -54,17 +59,16 @@ func _physics_process(delta):
 			jump_cnt+=1
 			velocity.y = JUMP_SPEED
 	
-	var speed = SPRINT_SPEED if Input.is_action_pressed("sprint") else SPEED
-	var target_vel = dir * speed
+		var speed = SPRINT_SPEED if Input.is_action_pressed("sprint") else SPEED
+		var target_vel = dir * speed
 	
-	var accel = ACCEL if is_on_floor() else AIR_ACCEL
-	current_vel = current_vel.linear_interpolate(target_vel, accel*delta)
-	
-	velocity.x = current_vel.x
-	velocity.z = current_vel.z
+		var accel = ACCEL if is_on_floor() else AIR_ACCEL
+		current_vel = current_vel.linear_interpolate(target_vel, accel*delta)
+		
+		velocity.x = current_vel.x
+		velocity.z = current_vel.z
 
 	velocity = move_and_slide(velocity, Vector3.UP, true, 4, deg2rad(45))
-
 
 func _input(event):
 	if is_network_master():
@@ -76,6 +80,13 @@ func _input(event):
 			#Rotation horizontal
 			self.rotate_y(deg2rad(event.relative.x*MOUSE_SENSITIVITY*-1))
 	
+puppet func update_movement(p_position, p_velocity):#,p_rotation):
+	puppet_position = p_position
+	puppet_velocity = p_velocity
+	#puppet_rotation = p_rotation
+	
+	tween_movement.interpolate_property(self, "global_transform", global_transform, Transform(global_transform.basis, p_position),.1)
+	tween_movement.start()
 #Gestion du curseur
 func window_activity():
 	if Input.is_action_just_pressed("ui_cancel"):
@@ -83,3 +94,10 @@ func window_activity():
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		else:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+
+func _on_TimerNetworkUpdate_timeout():
+	if is_network_master():
+		rpc_unreliable("update_movement",global_transform.origin, velocity)
+	else:
+		timer_network_update.stop()

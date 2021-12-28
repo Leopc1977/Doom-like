@@ -9,7 +9,6 @@ func _on_IPAdress_text_changed(new_text):
 func _on_Host_pressed():
 	Network.create_server()
 	var id = get_tree().get_network_unique_id()
-	print("[SERVER]: ID = "+str(id))
 	Global.emit_signal("instance_player",id)
 	
 	if get_tree().network_peer!=null:
@@ -18,7 +17,6 @@ func _on_Host_pressed():
 func _on_Join_pressed():
 	Network.join_server()
 	var id = get_tree().get_network_unique_id()
-	print("[CLIENT]: ID = "+str(id))
 	Global.emit_signal("instance_player",id)
 
 	if get_tree().network_peer!=null:
