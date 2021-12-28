@@ -67,6 +67,11 @@ func _physics_process(delta):
 		
 		velocity.x = current_vel.x
 		velocity.z = current_vel.z
+	else:
+		global_transform.origin = puppet_position
+		
+		velocity.x = puppet_velocity.x
+		velocity.y = puppet_velocity.y
 
 	velocity = move_and_slide(velocity, Vector3.UP, true, 4, deg2rad(45))
 
