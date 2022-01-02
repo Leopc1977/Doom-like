@@ -29,7 +29,7 @@ func join_server():
 	get_tree().network_peer = client
 
 func _connected_to_server():
-	print("Connected to the server")
+	print("[CLIENT]: Connected to the server")
 	
 func _server_disconnected():
 	print("Disconnected from the server")
